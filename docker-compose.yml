@@ -1,0 +1,26 @@
+version: "3.9"
+services:
+    mssql-server:
+        container_name: sworddb
+        image: mcr.microsoft.com/mssql/server:2017-latest
+        environment: 
+            ACCEPT_EULA: "Y"
+            SA_PASSWORD: "Pa55w0rd2021"
+        ports: 
+            - "1433:1433"
+    dncapi:
+        container_name: swordapi
+        build: 
+            context: ./API
+            dockerfile: Dockerfile
+        ports: 
+            - "5005:5005"
+    client:
+        container_name: swordui
+        build:
+            context: ./Client
+            dockerfile: Dockerfile
+        ports: 
+            - "5006:80"
+        depends_on: 
+                - dncapi

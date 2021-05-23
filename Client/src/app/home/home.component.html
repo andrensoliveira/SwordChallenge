@@ -1,0 +1,89 @@
+﻿<div class="card mt-4">
+
+    <div class="d-flex card-header" style="justify-content:space-between;align-items:center;">
+        <div style="font-weight: 500; line-height: 1.2;font-size:1.5rem;">Welcome back {{currentUser.firstName}} {{currentUser.lastName}}</div>
+        <div style="font-size:25px;">
+            <div *ngIf="!loading" style="cursor:pointer" (click)="sendQuery()">&#x21BB;</div>
+            <div *ngIf="loading" class="spinner-border spinner-border-sm"></div>
+        </div>
+    </div>
+
+    <div class="card-body">
+
+        <div class="d-flex" style="align-items:center;justify-content:space-between;">
+            <h6>{{message}}</h6>
+            <button [ngClass]="{'hidden': currentUser.role == 'Manager'}" id="btn" (click)="onNewTask()">&#x2B; New Task</button>
+        </div>
+
+        <div id="modal" class="modal">
+            <div class="modal-content">
+
+                <div class="d-flex" style="justify-content:space-between;margin-bottom:30px;">
+                    <div style="font-weight:bold;line-height:2;">Create New Task</div>
+                    <div id="close" class="close">&times;</div>
+                </div>
+
+                <form [formGroup]="taskForm">
+                    <textarea placeholder="Summary..." formControlName="summary"></textarea>
+                    <div class="d-flex" *ngIf="taskForm.controls.taskId.value" style="align-items:center;">
+                        <div style="margin-right:10px;">Completed</div>
+                        <input type="checkbox" formControlName="completed" style="margin-top:3px;" />
+                    </div>
+                </form>
+
+                <div class="d-flex" style="justify-content:flex-end;">
+                    <button id="saveBtn" [disabled]="taskForm.invalid || !canEdit" (click)="onSave()">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <ul *ngIf="taskList" style="margin-top:30px;padding:0;">
+            <li class="d-flex" style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #808080;justify-content:space-between">
+                <div style="width:10%">Task Id</div>
+                <div *ngIf="currentUser.role == 'Manager'" style="width:20%">Employee</div>
+                <div style="width:20%">Create Date</div>
+                <div style="width:20%">Performed Date</div>
+                <div>Actions</div>
+            </li>
+            <li *ngFor="let item of taskList" class="d-flex" style="margin-bottom:10px;justify-content:space-between">
+                <div style="width:10%">{{item.taskId}}</div>
+                <div *ngIf="currentUser.role == 'Manager'" style="width:20%">{{item.user}}</div>
+                <div style="width:20%">{{item.createdAt | date: 'mediumDate'}}</div>
+                <div *ngIf="item.performedDate" style="width:20%">{{item.performedDate | date: 'medium'}}</div>
+                <div *ngIf="!item.performedDate" style="width:20%">- -</div>
+                <div class="d-flex" style="align-items:center;justify-content:space-evenly;width:5%;">
+                    <img id="editBtn" [ngClass]="{'hidden': currentUser.role == 'Manager' && !item.performedDate}" src="/assets/icons/pencil.svg" style="height:14px;margin-top:1px;cursor:pointer;" (click)="onEdit(item)" />
+                    <img *ngIf="currentUser.role == 'Manager'" src="/assets/icons/bin.svg" style="height:15px;cursor:pointer;" (click)="onDelete(item.taskId)" />
+                </div>
+            </li>
+        </ul>
+
+        <div class="d-flex" style="justify-content:space-between;margin-top:40px;">
+            <div class="d-flex">
+                <div style="margin-right:5px;">Total Tasks:</div>
+                <div>{{taskCount}}</div>
+            </div>
+            <div class="d-flex" style="align-items:center;">
+                <img src="/assets/icons/nav_first.svg" style="height:11px;margin-top:1px;cursor:pointer;margin-right:10px;" (click)="goToPage(0)" />
+                <img src="/assets/icons/nav_previous.svg" style="height:11px;margin-top:1px;cursor:pointer;margin-right:10px;" (click)="goToPage(filters.controls.pagenumber.value - 1)" />
+                <img src="/assets/icons/nav_next.svg" style="height:11px;margin-top:1px;cursor:pointer;margin-right:10px;" (click)="goToPage(filters.controls.pagenumber.value + 1)" />
+                <img src="/assets/icons/nav_last.svg" style="height:11px;margin-top:1px;cursor:pointer;" (click)="goToPage(lastPage)" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div *ngIf="currentUser.role == 'Manager' && notificationList.length > 0" class="card mt-4">
+    <h4 class="card-header">Notifications</h4>
+    <div class="card-body">
+
+        <ul style="margin-top:30px;padding:0;">
+            <li *ngFor="let item of notificationList" class="d-flex" style="margin-bottom:10px;justify-content:space-between">
+                <div style="white-space:nowrap">{{item.message}}</div>
+                <div class="d-flex" style="align-items:center;justify-content:space-evenly;width:5%;">
+                    <img src="/assets/icons/bin.svg" style="height:15px;cursor:pointer;" (click)="onReadNotification(item.notificationId)" />
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>
