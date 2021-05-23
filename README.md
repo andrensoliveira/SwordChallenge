@@ -1,8 +1,10 @@
 # SwordChallenge
 
-1) download the resource images from docker: https://hub.docker.com/u/andrensoliveira 
+1) download the resource images from docker: https://hub.docker.com/u/andrensoliveira
 
-2) Setup the environment run from root:
+2) clone the repository
+
+3) Setup the environment run from root:
 
     $ docker-compose up --build
 
